@@ -1,29 +1,30 @@
 package web.config;
 
-import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
+import org.springframework.web.WebApplicationInitializer;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+import org.springframework.web.servlet.DispatcherServlet;
 
-public class AppInit extends AbstractAnnotationConfigDispatcherServletInitializer {
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRegistration;
 
-    // Метод, указывающий на класс конфигурации
+public class AppInit implements WebApplicationInitializer {
+
     @Override
-    protected Class<?>[] getRootConfigClasses() {
-        return null;
+    public void onStartup(ServletContext servletContext) throws ServletException {
+        AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
+        context.register(AppConfig.class);
+
+        DispatcherServlet dispatcherServlet = new DispatcherServlet(context);
+
+        ServletRegistration.Dynamic registration = servletContext.addServlet("myDispatcher",
+                dispatcherServlet);
+
+        if (registration != null) {
+            registration.setLoadOnStartup(1);
+            registration.addMapping("/");
+        } else {
+            throw new ServletException("Failed to register DispatcherServlet");
+        }
     }
-
-
-    // Добавление конфигурации, в которой инициализируем ViewResolver, для корректного отображения jsp.
-    @Override
-    protected Class<?>[] getServletConfigClasses() {
-        return new Class<?>[]{
-                WebConfig.class
-        };
-    }
-
-
-    /* Данный метод указывает url, на котором будет базироваться приложение */
-    @Override
-    protected String[] getServletMappings() {
-        return new String[]{"/"};
-    }
-
 }
