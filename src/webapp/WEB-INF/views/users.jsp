@@ -1,4 +1,5 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 <html>
 <head>
     <title>Users</title>
@@ -47,6 +48,19 @@
             width: 200px;
             margin-bottom: 10px;
         }
+        .error {
+            color: red;
+            margin-left: 10px;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        .form-group label {
+            display: inline-block;
+            width: 50px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -81,11 +95,19 @@
 
 <h2>Add User</h2>
 <div class="add-user-form">
-    <form action="/users/add" method="post">
-        <input type="text" name="name" placeholder="Name" required>
-        <input type="text" name="email" placeholder="Email" required>
+    <form:form action="/users/add" method="post" modelAttribute="user">
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <form:input path="name" name="name" />
+            <form:errors path="name" cssClass="error" /><br>
+        </div>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <form:input path="email" id="email" />
+            <form:errors path="email" cssClass="error" />
+        </div>
         <button type="submit">Add User</button>
-    </form>
+    </form:form>
 </div>
 </body>
 </html>

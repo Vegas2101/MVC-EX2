@@ -1,46 +1,55 @@
 package web.service;
 
 
-import org.springframework.stereotype.Repository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import web.dao.UserDao;
 import web.model.User;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.transaction.Transactional;
 import java.util.List;
 
-@Repository
+@Service
 @Transactional
 public class UserServiceImpl implements UserService {
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    private final UserDao userDao;
+
+    @Autowired
+    public UserServiceImpl(UserDao userDao) {
+        this.userDao = userDao;
+    }
 
     @Override
+    @Transactional(readOnly = true)
     public List<User> findAll() {
-        return entityManager.createQuery("FROM User", User.class).getResultList();
+        return userDao.findAll();
     }
-
     @Override
+    @Transactional(readOnly = true)
     public User findById(Long id) {
-        return entityManager.find(User.class, id);
+        return userDao.findById(id);
     }
-
     @Override
+    @Transactional
     public void save(User user) {
-        entityManager.persist(user);
+        if (user.getId() == null) {
+            userDao.save(user);
+        } else {
+            userDao.update(user);
+        }
     }
-
     @Override
+    @Transactional
     public void update(User user) {
-        entityManager.merge(user);
+        userDao.update(user);
     }
-
     @Override
+    @Transactional
     public void delete(Long id) {
-        User user = findById(id);
-        if (user != null) {
-            entityManager.remove(user);
+        User user = userDao.findById(id);
+        if (user!= null) {
+            userDao.delete(user);
         }
     }
 }
